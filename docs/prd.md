@@ -1,726 +1,863 @@
 # Koda — Product Requirements Document (PRD)
 
-**Versão:** 1.0
-**Data:** 29 de março de 2026
-**Autor:** Pedro Caetano
-**Status:** Draft (pronto para validação)
+**Versao:** 2.0
+**Data:** 29 de marco de 2026
+**Autor:** Morgan (@pm), com base nos documentos de arquitetura de Aria (@architect)
+**Status:** Aprovado — baseado em arquitetura validada
+**Founder:** Pedro Caetano
 
 ---
 
-## 1. Goals and Background Context
+## Changelog
 
-### Goals
-O **Koda** busca alcançar os seguintes objetivos:
-
-- Oferecer um **professor de programação acessível 24/7** via WhatsApp, eliminando fricção de acesso
-- **Personalizar o aprendizado** ao ritmo e nível de cada aluno, aumentando retenção e satisfação
-- **Democratizar educação tech** no Brasil, atingindo alunos que não conseguem acessar bootcamps caros
-- Construir um negócio sustentável com **LTV:CAC > 3:1** e retenção mensal > 90%
-- Criar um modelo escalável que possa servir 10k+ alunos sem custo marginal significativo
-
-### Background Context
-
-A educação de programação no Brasil enfrenta uma **paradoxo crítico:**
-- Há uma **demanda crescente** por talento tech (falta de 500k devs segundo pesquisas)
-- Mas cursos tradicionais têm **desistência > 70%** (muito longos, caros, genéricos)
-- Plataformas de ensino (Alura, Udemy) tiveram sucesso, mas criam **fricção:** desinstalar app, abrir site, focar em computador
-- O **WhatsApp é o canal de menor fricção** — está no celular de 130M brasileiros, acessado 100+ vezes/dia
-
-**O Koda resolve isso** oferecendo:
-- ✅ **Aprendizado no WhatsApp** — nenhuma fricção de download/plataforma
-- ✅ **Disponibilidade 24/7** — dúvidas respondidas imediatamente, qualquer hora
-- ✅ **Personalização real** — adapta tom, ritmo, nível a cada aluno
-- ✅ **Prático** — código real, exercícios, feedback line-by-line
-- ✅ **Memória contextual** — retoma de onde parou, sem repetir conteúdo
-
-### Change Log
-
-| Data | Versão | Descrição | Autor |
-|---|---|---|---|
-| 29-Mar-2026 | 1.0 | Inicial — baseado em Project Brief v1.0 | Pedro Caetano |
+| Data | Versao | Descricao | Autor |
+|------|--------|-----------|-------|
+| 29-Mar-2026 | 1.0 | Draft inicial baseado no Project Brief v1.0 | Pedro Caetano |
+| 29-Mar-2026 | 2.0 | Reescrita completa — stack corrigida, anti-dropout, gamificacao, founder-first | Morgan (@pm) |
 
 ---
 
-## 2. Requirements
+## 1. Visao do Produto
 
-### Functional Requirements
+### One-liner
 
-#### FR1: Onboarding Inteligente
-O sistema deve capturar informações do novo aluno e construir um roadmap personalizado.
-- O aluno manda "Oi" ou qualquer primeira mensagem
-- Professor IA responde com onboarding: "Qual é seu objetivo? Aprender do zero? Mudar de carreira?"
-- Pergunta nível atual (zero experiência, já fez algum HTML, etc)
-- Pergunta tempo disponível por dia (15 min, 30 min, 1h+)
-- Com base nas respostas, constrói um roadmap (ex: "10 semanas de HTML/CSS até seu primeiro site")
-- Armazena perfil no Supabase (user, goal, level, availability)
-- Exibe roadmap visual (texto, ex: "📘 Semana 1-2: HTML Basics → Semana 3-4: CSS → Semana 5-6: JavaScript Intro...")
+Professor de programacao por IA que ensina do zero ao SaaS, acessivel via WhatsApp e Web App, desenhado para cerebros inquietos (TDAH-friendly).
 
-#### FR2: Aulas Conversacionais
-O sistema deve ensinar conceitos de forma progressiva, usando exemplos e adaptando ao aluno.
-- Professor explica um conceito em passos pequenos (máx 2-3 parágrafos por mensagem)
-- Usa analogias simples e exemplos práticos (ex: "Uma tag HTML é como um container que embrulha seu conteúdo")
-- Pede ao aluno para resumir o que entendeu ("Você consegue me explicar o que é uma div?")
-- Adapta linguagem e complexidade baseado no nível do aluno (iniciante = analogias, intermediário = termos técnicos)
-- Pode fazer perguntas (Socratic method) para testar compreensão
-- Armazena todas as mensagens no Supabase para contexto futuro
+### Problema
 
-#### FR3: Exercícios Práticos
-O sistema deve propor desafios de código e avaliar as respostas do aluno.
-- Após explicar um conceito, professor envia um exercício (ex: "Crie um HTML com seu nome e email")
-- Aluno responde colando o código na mensagem (ou foto de tela)
-- Professor lê o código, identifica erros e explica:
-  - O que está certo
-  - O que está errado e por quê
-  - Como consertar linha a linha
-  - Dicas de boas práticas
-- Aluno pode tentar novamente (até acertar)
-- Após acerto, professor marca exercício como completo no Supabase e avança
+A educacao de programacao no Brasil enfrenta um paradoxo:
+- Ha demanda crescente por talento tech (falta de 500k+ devs)
+- Cursos tradicionais tem **desistencia > 70%** (longos, caros, genericos)
+- Para cerebros TDAH, e pior: hiperfoco inicial gera animacao, rotina faz dopamina cair, abandono gera culpa, e o aluno nao volta mais
+- Plataformas existentes (Alura, Udemy, Rocketseat) criam friccao: exigem computador, sessoes longas, formato repetitivo
 
-#### FR4: Correção de Código
-O sistema deve analisar código submetido pelo aluno e dar feedback detalhado.
-- Aluno pode enviar código a qualquer momento (não apenas em exercícios)
-- Submete por texto (cola direto) ou foto (screenshot)
-- Professor analisa e retorna:
-  - Bugs encontrados (lista numerada)
-  - Raiz de cada erro (por que não funciona)
-  - Código corrigido (pequenas modificações destacadas)
-  - Alternativas (forma melhor de fazer)
-  - Performance notes (se relevante)
-- Exemplo: "Seu loop tem um bug na linha 3. Você está incrementando i fora do escopo. Aqui está correto: [código]"
+### Solucao
 
-#### FR5: Modo Dúvida Rápida
-O sistema deve responder perguntas ad-hoc sobre programação, respeitando o contexto do aluno.
-- Aluno pode perguntar qualquer coisa sobre programação (não apenas assuntos da aula)
-- Exemplos: "Como fazer um loop em Python?", "Qual a diferença entre var e let?", "O que é API?"
-- Professor responde com precisão mas adaptado ao nível do aluno
-- Não interrompe o fluxo de aula, mas pode integrar à próxima aula se relevante
-- Armazenado em histórico para contexto
+Koda e um professor de programacao por IA que:
+- Ensina via **WhatsApp** (menor friccao possivel — 130M brasileiros usam diariamente)
+- Complementa com **Web App** (dashboard visual, playground de codigo, mapa gamificado)
+- Foi **desenhado para TDAH** com 7 mecanismos anti-abandono integrados ao sistema
+- Usa **3 portoes de progressao** que exigem demonstracao real de aprendizado
+- Oferece **gamificacao profunda** (XP, streaks, badges, niveis, mapa visual tipo jogo)
+- Segue o **curriculo Zero-a-SaaS** em 30 modulos / 5 fases / 6-8 meses
 
-#### FR6: Memória de Contexto
-O sistema deve lembrar do progresso anterior e retomar de forma natural.
-- Cada sessão armazena: [aluno_id, data, tópico, exercícios_completados, notas]
-- Quando aluno volta após dias, professor começa com: "Oi! Continuamos onde paramos: você já sabe HTML. Vamos para CSS agora?"
-- Recupera histórico via Supabase (simples na V1)
-- Na V2: adicionar embeddings para encontrar sessões relevantes (RAG)
-- Mostra progresso: "Você completou 3 de 10 semanas do seu roadmap"
+### Principio Arquitetural
 
-#### FR7: Visualização de Progresso
-O sistema deve permitir ao aluno ver seu progresso no roadmap.
-- Aluno pergunta: "Como vou no meu roadmap?" ou "Qual é meu progresso?"
-- Professor responde: "📊 Você completou 3 de 10 semanas. Tópicos: ✅ HTML, ✅ CSS Basics, 🔄 CSS Advanced. Próximo: JavaScript Intro"
-- Mostra visualmente (emoji + texto)
-- Baseado em exercícios completados no Supabase
+```
+NAO E O ALUNO QUE PRECISA TER DISCIPLINA.
+E O SISTEMA QUE PRECISA SER IMPOSSIVEL DE ABANDONAR.
+```
+
+Anti-abandono nao e uma feature — e uma propriedade do sistema inteiro.
 
 ---
 
-### Non-Functional Requirements
+## 2. Publico-Alvo
 
-#### NFR1: Performance
-- **Latência de resposta:** < 3 segundos (máximo aceitável para conversação natural)
-- **Timeout:** Se API demora > 5s, retorna erro amigável ("Estou um pouco lento... tente novamente")
-- **Throughput:** Capacidade de processar 1000 mensagens/dia no MVP
+### Aluno #1: Pedro Caetano (Founder-First Strategy)
 
-#### NFR2: Disponibilidade
-- **Uptime:** 99.5% (máx 3h downtime/mês)
-- **Failover:** Se API de IA falha, retorna mensagem padrão (não quebra conversação)
-- **Rate limiting:** Máx 10 mensagens/minuto por aluno (previne abuse)
+Pedro e simultaneamente o founder do Koda e seu primeiro aluno. Ele:
+- Tem TDAH e precisa dos mecanismos anti-abandono para si mesmo
+- Nao sabe programar ainda — e o publico-alvo do proprio produto
+- Vai aprender programacao USANDO o Koda
 
-#### NFR3: Segurança
-- **Webhooks:** Validação de origem (WhatsApp signature verification)
-- **Dados pessoais:** Criptografar profile do aluno (nome, email, objetivo)
-- **Rate limiting:** Prevenir brute force / spam
-- **HTTPS only:** Todas as comunicações cifradas
-- **RLS no Supabase:** Cada aluno vê apenas suas próprias sessões
+**Ciclo Virtuoso Build-Learn-Improve:**
 
-#### NFR4: Escalabilidade
-- **Arquitetura serverless:** Functions disparadas por webhook (sem servidor sempre ligado)
-- **Banco:** Supabase com pgvector (embeddings escaláveis)
-- **Cache:** Respostas comuns cacheadas (ex: "O que é HTML?")
-- **Custo marginal:** Idealmente < R$ 1 por aluno/mês em APIs
+| Fase | Pedro faz | Pedro aprende |
+|------|-----------|---------------|
+| Fase 1 (agora) | IA constroi o Koda | Fundamentos (logica, HTML, CSS) |
+| Fase 2 (mes 2-3) | Entende HTML/CSS/JS | Comeca a LER o codigo do Koda |
+| Fase 3 (mes 4-5) | Entende TS/APIs/banco | Comeca a MODIFICAR o Koda |
+| Fase 4 (mes 6-8) | Entende fullstack | CONSTROI features no Koda |
+| Fase 5 (mes 8+) | E programador | Cria OUTROS SaaS |
 
-#### NFR5: Confiabilidade
-- **Logging:** Todas as conversas armazenadas (auditoria, debugging)
-- **Error handling:** Erros loggados em Sentry, alertas se taxa > 1%
-- **Mensagens idempotentes:** Se webhook é entregue 2x, não duplica resposta
+**O Koda e o veiculo, nao o destino.** O destino e Pedro ter autonomia para criar qualquer produto digital.
 
-#### NFR6: Usabilidade
-- **Linguagem:** Português brasileiro, tom amigável e encorajador
-- **Clareza:** Respostas < 2000 caracteres (limite prático do WhatsApp)
-- **Acessibilidade:** Texto claro (sem jargão desnecessário)
-- **Feedback:** Sempre confirmar quando aluno acerta ou erra (positivo/construtivo)
+### Publico Primario
 
----
+- 18-35 anos, Brasil
+- Quer aprender programacao para mudar de carreira ou criar SaaS
+- Tem TDAH ou dificuldade de foco em formatos tradicionais
+- Usa WhatsApp diariamente
+- Prefere celular a computador
+- Nao tem paciencia para videos longos
 
-## 3. User Interface Design Goals
+### Publico Secundario
 
-### Overall UX Vision
-**Koda não é uma "app" — é uma conversa natural.** A UX é a conversa mesma.
-
-O professor deve:
-- ✅ Ser **amigável e encorajador** — nunca criticar, sempre construir
-- ✅ Ser **claro e conciso** — respostas curtas, fáceis de entender no celular
-- ✅ Ser **prático** — sempre exemplos reais, código real
-- ✅ Ser **adaptável** — ajustar tom/complexidade ao aluno
-- ✅ Ser **responsivo** — responder < 3s (sensação de conversa ao vivo)
-
-### Key Interaction Paradigms
-1. **Conversação de múltiplas voltas** — aluno → professor → aluno (não monólogos)
-2. **Progressão clara** — cada mensagem avança o aprendizado (não enche linguiça)
-3. **Feedback positivo** — "✅ Perfeito!" para acertos, construtivo para erros
-4. **Exemplos visuais** — código em blocos formatados, não inline misturado
-5. **Chamadas à ação** — "Tente fazer um loop agora" (não deixa passivo)
-
-### Core Screens and Views
-(No WhatsApp, "screens" são conversações estruturadas)
-
-| Fluxo | Descrição |
-|---|---|
-| **Onboarding** | Professor faz 4 perguntas, monta roadmap |
-| **Aula** | Explicação → Exemplo → Pergunta de compreensão → Exercício |
-| **Exercício** | Desafio proposto → Aluno tenta → Feedback → Próximo |
-| **Dúvida Rápida** | Aluno pergunta → Professor responde direto |
-| **Progresso** | Aluno pede resumo → Professor mostra roadmap + completados |
-| **Revisão** | Professor oferece "Quer revisar HTML antes de prosseguir?" |
-
-### Accessibility: WCAG AA
-- **Texto legível** — fonte clara, contraste suficiente (WhatsApp default)
-- **Sem dependência de cor** — não usar apenas cor para significado (ex: sempre texto + emoji)
-- **Emoji descriptive** — usar emoji para visual mas não como único indicador
-- **Estrutura clara** — headers, bullet points, não paredes de texto
-
-### Branding
-**Tom:** Engajador, encorajador, como um colega mais experiente (não robô, não professor pomposo)
-
-**Exemplos de resposta:**
-- ✅ "Legal! Você entendeu. Agora vamos um passo além..."
-- ✅ "Quase lá! O seu código tem um bug na linha 3. Vê só: [código]"
-- ✅ "Perfeito! Você construiu seu primeiro HTML. Que sensação!"
-- ❌ "INCORRETO. Você cometeu um erro sintático na linha 3."
-
-**Visual markers:**
-- ✅ para sucesso
-- ❌ para erro
-- 🔄 para em progresso
-- 📘 para teoria
-- 💻 para código
-- 🎯 para objetivo
-- 📊 para progresso
-
-### Target Platforms
-- **WhatsApp Business (Brasil)** — prioridade V1
-- **Responsividade:** Mobile first (toda conversa otimizada para celular)
-- **Futuro:** Considerar Telegram, TikTok DM (mas fora de V1)
+- Desenvolvedores iniciantes querendo chegar a fullstack
+- Empreendedores querendo entender tech para criar produtos
 
 ---
 
-## 4. Technical Assumptions
+## 3. Stack Tecnologica
 
-### Repository Structure
-**Monorepo** (estrutura simples para startup)
+| Camada | Tecnologia | Justificativa |
+|--------|-----------|---------------|
+| **WhatsApp** | Evolution API v2 (self-hosted na VPS) | Ja rodando, sem custo mensal, controle total |
+| **Backend** | Hono (TypeScript) | Leve, TypeScript-first, Web Standard APIs, facil portar para Edge |
+| **Runtime** | Node.js 20+ | Compatibilidade com Evolution API e ecossistema |
+| **Banco de Dados** | Supabase (Postgres + pgvector + RLS + Auth) | Auth, RLS, realtime, embeddings futuros |
+| **IA Principal** | Claude Sonnet 4 | Melhor para educacao, empatia, explicacoes detalhadas |
+| **IA Classificador** | Claude Haiku 4.5 | Rapido e barato para classificar intencao (14 intents) |
+| **Audio** | Whisper (OpenAI) | Transcrever audios de voz do aluno |
+| **Web App** | Next.js 16 (App Router) | Dashboard, playground, mapa visual gamificado |
+| **Hosting Web** | Vercel | Zero-config para Next.js, CDN global |
+| **Hosting Backend** | VPS existente | Evolution API + Hono na mesma VPS |
+
+### Decisoes Arquiteturais Chave (ADRs)
+
+| ADR | Decisao | Consequencia |
+|-----|---------|-------------|
+| ADR-001 | Hono em vez de Express | Mais leve, TypeScript-first, portavel para Edge/Cloudflare |
+| ADR-002 | Evolution API em vez de Twilio | Self-hosted, custo zero, flexibilidade total |
+| ADR-003 | Claude unico (sem GPT fallback) | Simplifica arquitetura; se Claude cair, bot fica offline (aceitavel no MVP) |
+| ADR-004 | Web App acessa Supabase direto | Mais simples, menos latencia; RLS garante seguranca |
+| ADR-005 | Curriculo em YAML, nao no banco | Facil de versionar, editar, fazer PR; cache em memoria |
+| ADR-006 | Structured Output do Claude | Cada resposta inclui JSON com decisoes + texto; post-processing automatico |
+
+---
+
+## 4. Requisitos Funcionais
+
+### FR1: Pipeline de Processamento de Mensagem (10 Etapas)
+
+Toda mensagem passa por um pipeline de 10 etapas:
+
+| Etapa | Modulo | Funcao | SLA |
+|-------|--------|--------|-----|
+| 1 | Receive & Parse | Extrair phone, text, type (text/audio/image). Audio → Whisper | < 50ms |
+| 2 | Identify User | Buscar usuario no Supabase. Se nao existe → criar | < 100ms |
+| 3 | Rate Limit | < 10 msgs/min por usuario. Excedeu → "Calma, estou processando" | < 10ms |
+| 4 | Classify Intent | Claude Haiku classifica intencao (14 intents) | 200-500ms |
+| 5 | State Machine | Verificar estado atual e decidir transicao (FSM) | < 10ms |
+| 6 | Build Context | Montar prompt em 6 camadas (personalidade + modo + perfil + curriculo + historico + output) | < 200ms |
+| 7 | AI Engine | Claude Sonnet gera resposta. Timeout 15s com fallback | 2-8s |
+| 8 | Post-Process | Extrair decisoes, atualizar progresso, calcular XP, verificar badges | < 100ms |
+| 9 | Format & Send | Formatar para WhatsApp (bold, code, emoji). Quebrar em < 2000 chars. Enviar via Evolution | < 200ms |
+| 10 | Log & Update | Salvar interacao, sessao, progresso, gamificacao no Supabase | < 200ms |
+
+**Tempo total esperado: 3-10 segundos (SLA < 15s)**
+
+### FR2: Intent Classifier (14 Intencoes)
+
+| Intent | Descricao | Exemplo |
+|--------|-----------|---------|
+| `greeting` | Saudacao | "Oi", "Bom dia" |
+| `onboarding_response` | Resposta a pergunta de onboarding | "Quero aprender do zero" |
+| `lesson_continue` | Quer continuar aula | "Vamos la", "Proximo" |
+| `lesson_explain_again` | Nao entendeu | "Nao entendi", "Repete?" |
+| `code_submission` | Enviou codigo | `function soma(a, b) {...}` |
+| `exercise_answer` | Resposta textual a exercicio | "A resposta e 42" |
+| `gate_response` | Explicacao com proprias palavras | "Entao, uma variavel e tipo..." |
+| `doubt` | Pergunta sobre programacao | "O que e API?" |
+| `progress_check` | Quer ver progresso | "Como estou?" |
+| `mood_check` | Indicador de humor/energia | "To focado", "Cansei" |
+| `quiz_answer` | Resposta a quiz | "Alternativa B" |
+| `off_topic` | Fora do escopo | "Qual a capital da Franca?" |
+| `audio` | Mensagem de audio | (audio file) |
+| `image` | Imagem/screenshot | (image file) |
+
+**Custo estimado por classificacao:** ~$0.001 (Haiku)
+
+### FR3: State Machine (Conversation FSM)
+
+| Estado | Descricao |
+|--------|-----------|
+| IDLE | Usuario inativo |
+| ONBOARDING_1..4 | 4 etapas sequenciais de onboarding |
+| HUB | Menu principal — mood selector |
+| LESSON_EXPLAIN | Explicacao de conceito |
+| GATE_1 | Portao de compreensao |
+| GATE_2 | Portao de pratica |
+| GATE_3 | Portao de aplicacao |
+| QUIZ | Quiz relampago |
+| DOUBT | Modo duvida livre |
+| BREAK | Pausa (aluno cansou) |
+
+**Transicoes principais:**
+
+- IDLE → ONBOARDING_1 (usuario novo) ou HUB (usuario existente)
+- ONBOARDING_4 → HUB (onboarding completo)
+- HUB → LESSON_EXPLAIN (focado) | QUIZ (quero jogar) | DOUBT (duvida) | BREAK (cansei)
+- LESSON_EXPLAIN → GATE_1 → GATE_2 → GATE_3 → HUB (conceito dominado)
+- GATE_1 reprovado → LESSON_EXPLAIN (re-explicar com analogia diferente)
+- GATE_2 errado → GATE_2 (max 3 tentativas, depois mostra solucao)
+
+### FR4: Onboarding Inteligente (4 Perguntas)
+
+Sequencia de 4 perguntas ao primeiro contato:
+1. **Objetivo:** "Aprender do zero" | "Mudar de carreira" | "Criar SaaS"
+2. **Nivel:** "Nunca programei" | "Fiz HTML basico" | "Sei JavaScript"
+3. **Disponibilidade:** Minutos por dia
+4. **Nome:** Como quer ser chamado
+
+Armazena perfil completo no Supabase e gera roadmap personalizado.
+
+### FR5: Sistema de 3 Portoes por Conceito
+
+Koda NAO aceita "entendi" como progresso. O aluno precisa DEMONSTRAR:
+
+**Portao 1 — Compreensao:**
+- Koda explica com analogia e exemplo
+- Pede: "Me explica com suas palavras"
+- Claude avalia com criterios pre-definidos
+- Aprovado: mencionou pontos-chave com proprias palavras
+
+**Portao 2 — Pratica:**
+- Exercicio de codigo com criterios de validacao
+- Ate 3 tentativas com feedback progressivo
+- Se nao conseguir em 3x: mostra solucao e marca "completou com ajuda"
+
+**Portao 3 — Aplicacao:**
+- Mini-desafio que combina conceito novo + anteriores
+- Forca o aluno a pensar, nao copiar
+- Claude avalia criatividade + correcao
+
+**Niveis de dominio:**
+
+| Nivel | Indicador | Significado |
+|-------|-----------|-------------|
+| learning | Vermelho | Ainda nao passou portao 1 |
+| practiced | Amarelo | Passou portoes 1 e 2 |
+| mastered | Verde | Passou todos os 3 portoes |
+| reviewed | Estrela | Revisou apos 7+ dias e lembrava |
+
+**Regras de progressao:**
+- So avanca se conceito atual esta "practiced" ou "mastered"
+- So avanca de MODULO se 80% dos conceitos estao "mastered"
+- Se volta apos 7+ dias: revisao relampago antes de avancar
+- Spaced repetition: conceitos "practiced" reaparecem como aquecimento
+
+### FR6: 7 Mecanismos Anti-Abandono (TDAH-Proof)
+
+#### 1. Micro-Completude (Nunca sair sem vitoria)
+- TODA interacao gera XP, mesmo "cansei" (+15 XP "Honestidade e XP tambem")
+- O sistema NUNCA termina sessao sem dar XP
+- Minimo garantido: 5 XP por sessao
+
+#### 2. Formato Nunca Repete (Anti-monotonia algoritmico)
+8 formatos disponiveis:
+- Quiz relampago (30s por pergunta)
+- Desafio de codigo
+- Ache o bug (puzzle de debugging)
+- Ordene as linhas (quebra-cabeca logico)
+- Boss fight (junta 3+ conceitos)
+- Revisao aleatoria
+- "O que esse codigo faz?" (leitura)
+- Speed coding (resolva em 2 min)
+
+Regras: nunca repete os ultimos 2 formatos, adapta ao humor, 20% chance de formato surpresa.
+
+#### 3. Re-Engajamento Proativo (O Koda vem ate voce)
+Cascata progressiva de mensagens via WhatsApp:
+- Dia 2: mensagem leve ("Quiz de 30s?")
+- Dia 3: apelo a perda ("Streak em risco!")
+- Dia 5: curiosidade ("2 conceitos para desbloquear Ilha JS")
+- Dia 7: desafio direto (envia ache-o-bug)
+- Dia 14: empatia ("Tudo bem sumir. Progresso salvo.")
+- Dia 30: ultimo toque ("Faz 1 mes! Tem novidades")
+- Depois: silencio (respeita a decisao do aluno)
+
+Regras: NUNCA mais de 1 msg/dia, NUNCA culpar, SEMPRE oferecer algo facil.
+
+#### 4. Zero Culpa (Re-entry sem friccao)
+- Quando volta, o sistema COMEMORA
+- NUNCA menciona quanto tempo ficou fora de forma negativa
+- Streaks quebrados NAO sao mencionados; novo streak comeca imediatamente
+- Progresso, badges e XP NUNCA sao perdidos
+- "Streak de volta" bonus: +20 XP extra por voltar
+
+#### 5. Dificuldade Adaptativa (Nunca frustra, nunca entedia)
+Avaliacao a CADA interacao baseada em sinais:
+- Muito facil: responde < 10s, 5 acertos seguidos → aumentar dificuldade
+- Muito dificil: 3 erros seguidos, msgs frustradas → baixar, mudar abordagem
+- No flow: respostas em 30s-3min, mix de acertos → manter ritmo
+
+#### 6. Progresso Sempre Visivel (Dopamina visual)
+Progresso mostrado proativamente em 3 momentos:
+- Apos cada micro-vitoria (inline na conversa com barra de progresso)
+- Ao final de cada sessao (summary com XP, streak, proximos milestones)
+- Semanalmente (relatorio motivacional com estatisticas)
+
+#### 7. Compromisso Minimo de 30 Segundos
+- O compromisso minimo e 30 SEGUNDOS, nao 5 minutos
+- Quiz de 1 pergunta mantem o streak ("Streak protection")
+- O sistema NUNCA exige sessao minima > 30 segundos
+- 60% das vezes o aluno continua alem dos 30s
+
+### FR7: Gamificacao
+
+#### Sistema de XP
+
+| Acao | XP |
+|------|----|
+| Portao 1 aprovado | +30 |
+| Portao 2 aprovado | +50 |
+| Portao 2 com ajuda | +25 |
+| Portao 3 aprovado | +100 |
+| Quiz correto | +20 |
+| Ache-o-bug resolvido | +40 |
+| Speed coding < 2min | +60 |
+| Revisao apos 7 dias | +30 |
+| Streak bonus 7 dias | +100 |
+| Streak bonus 30 dias | +500 |
+| Abriu o Koda hoje | +5 |
+| Respondeu 1 pergunta | +10 |
+| Disse "cansei" (honestidade) | +15 |
+
+#### Niveis
+
+| Nivel | XP | Titulo |
+|-------|-----|--------|
+| 1 | 0 | Curioso |
+| 2 | 200 | Aprendiz |
+| 3 | 500 | Praticante |
+| 4 | 1000 | Codador |
+| 5 | 2000 | Developer |
+| 6 | 4000 | Fullstack |
+| 7 | 7000 | Arquiteto |
+| 8 | 10000 | Mestre Koda |
+
+#### Badges
+
+| Badge | Criterio |
+|-------|---------|
+| Primeiro Codigo | Completar primeiro exercicio |
+| Streak 7 | 7 dias seguidos |
+| Streak 30 | 30 dias seguidos |
+| Bug Hunter | 10 ache-o-bug resolvidos |
+| Speed Demon | 5 speed codings < 2min |
+| Ilha Completa | Todos conceitos mastered em 1 modulo |
+| Fase Completa | Todos modulos de 1 fase |
+| Revisao Mestre | 20 conceitos revisados apos 7 dias |
+| Madrugador | Estudar antes das 7h |
+| Noturno | Estudar depois das 23h |
+
+### FR8: System Prompts (6 Camadas)
+
+Cada chamada ao Claude Sonnet monta o prompt em camadas:
+
+| Camada | Conteudo |
+|--------|----------|
+| Layer 1: Base Personality | Personalidade Koda, tom, regras gerais, limitacoes |
+| Layer 2: Mode-Specific | Prompt do modo ativo (onboarding/lesson/exercise/gate/quiz/doubt) |
+| Layer 3: Student Profile | Nome, nivel, objetivo, humor, pontos fortes/fracos |
+| Layer 4: Curriculum Context | Modulo atual, conceito, prerequisitos, conteudo didatico, exercicio |
+| Layer 5: Conversation History | Ultimas 10 mensagens, resumo de sessoes anteriores |
+| Layer 6: Output Instructions | Formato de resposta (JSON structured output + texto), limites de caracteres |
+
+**Structured Output:** Cada resposta do Claude retorna JSON com decisoes (gate_passed, xp_earned, next_state, mastery_update, format_suggestion) + texto para o aluno.
+
+### FR9: Web App (Next.js 16)
+
+| Rota | Tipo | Descricao |
+|------|------|-----------|
+| `/` | Publica | Landing page + login |
+| `/dashboard` | Protegida | Stats, streak, XP, progresso geral |
+| `/roadmap` | Protegida | Mapa visual tipo jogo (ilhas, montanhas) |
+| `/playground` | Protegida | Code editor no browser (Monaco) |
+| `/badges` | Protegida | Conquistas e colecao de badges |
+| `/settings` | Protegida | Configuracoes do perfil |
+
+**Autenticacao:** Supabase Auth com magic link via WhatsApp (OTP enviado via Evolution API).
+
+**Comunicacao com dados:** Web App acessa Supabase diretamente (anon key + RLS), sem passar pelo Hono. RLS garante seguranca.
+
+**Mapa Visual (Roadmap Gamificado):** Componente React interativo (Canvas/SVG) onde cada "ilha" representa um modulo. Ilhas sao desbloqueadas conforme o aluno avanca. Conceitos aparecem como nodes clicaveis dentro de cada ilha. Progresso sincronizado em real-time via Supabase Realtime.
+
+```
+Ilha HTML → Monte CSS → Vulcao JavaScript → Castelo TypeScript
+                                                    |
+                                          Mar do Backend → Cidade React → Base SaaS → LANCAMENTO
+```
+
+### FR10: Modo Duvida Rapida
+
+- Aluno pode perguntar qualquer coisa sobre programacao a qualquer momento
+- Nao interrompe fluxo de aula (DOUBT empilha estado anterior via context_stack)
+- Resposta adaptada ao nivel do aluno
+- Apos responder, volta ao estado anterior
+
+### FR11: Audio (Whisper)
+
+- Aluno envia audio → Whisper transcreve → texto entra no pipeline normal
+- Aluno pode explicar por voz (util para Portao 1 — compreensao)
+- Suporte a portugues brasileiro
+
+### FR12: Dropout Risk Score (Modelo Preditivo)
+
+Score calculado diariamente para cada usuario (0.0 a 1.0):
+
+| Fator | Peso |
+|-------|------|
+| Dias sem atividade (>=7 dias) | +0.30 |
+| Sessoes encurtando (tendencia) | +0.20 |
+| Taxa de acerto caindo | +0.15 |
+| Streak quebrado recentemente | +0.10 |
+| Formatos se repetindo | +0.10 |
+| Nunca passou do modulo 2 (>20 sessoes) | +0.15 |
+| Badge recente (ultimos 7 dias) | -0.10 |
+| Streak >= 7 dias | -0.15 |
+
+Se risk > 0.5 → acionar re-engajamento proativo
+Se risk > 0.8 → alerta no admin dashboard
+
+---
+
+## 5. Requisitos Nao-Funcionais
+
+### NFR1: Performance
+
+| Metrica | Meta |
+|---------|------|
+| Latencia total (mensagem → resposta) | 3-10s (SLA < 15s) |
+| Classificacao de intent (Haiku) | < 1s |
+| AI Engine (Sonnet) | < 15s com timeout e fallback |
+| Throughput MVP | 1000 mensagens/dia |
+| Idle indicator | Enviar "digitando..." enquanto processa |
+
+### NFR2: Disponibilidade
+
+| Metrica | Meta |
+|---------|------|
+| Uptime | 99.5% (max 3h downtime/mes) |
+| Failover Claude | Mensagem de fallback "Voltamos em breve" |
+| Evolution API | Health check + restart automatico (PM2) |
+| Idempotencia | Dedup por message_id (Evolution envia 2x as vezes) |
+
+### NFR3: Seguranca
+
+| Camada | Implementacao |
+|--------|--------------|
+| Transporte | HTTPS obrigatorio (Supabase, Evolution, Claude) |
+| Webhook | Validar API key do Evolution no header |
+| Rate Limiting | 10 msgs/min por usuario, 100 msgs/hora |
+| RLS | Supabase Row Level Security em todas tabelas de usuario |
+| Auth (Web) | Supabase Auth com magic link/OTP |
+| Secrets | Env vars, nunca hardcoded |
+| Idempotencia | Dedup por message_id |
+| Input Sanitization | Limpar input antes de passar para Claude |
+| Prompt Injection | System prompt robusto + guardrails ("NUNCA saia do papel de professor") |
+
+### NFR4: Escalabilidade
+
+| Cenario | Arquitetura |
+|---------|-------------|
+| MVP (100 alunos) | VPS existente + Supabase free tier + Vercel hobby |
+| Growth (500 alunos) | Supabase Pro + monitoramento de custo |
+| Scale (1000+ alunos) | Avaliar Edge deploy (Hono portavel para Cloudflare) |
+
+### NFR5: Confiabilidade
+
+- Logging estruturado de todas interacoes no Supabase
+- Error handling com Sentry (alertas se taxa > 1%)
+- Idempotencia de webhooks
+- Backups automaticos (Supabase gerencia)
+
+### NFR6: Usabilidade
+
+- Portugues brasileiro, tom amigavel e encorajador
+- Respostas < 2000 caracteres (limite pratico do WhatsApp)
+- Sem jargao desnecessario
+- Feedback sempre positivo/construtivo (nunca "INCORRETO")
+- Emojis contextuais para reforco visual
+
+---
+
+## 6. Curriculo: Zero a SaaS (30 Modulos, 5 Fases)
+
+### Fase 1 — Fundamentos (Semanas 1-6)
+
+| # | Modulo | Conceitos | Conexao com o Koda |
+|---|--------|-----------|--------------------|
+| 1 | Logica de programacao | Variaveis, condicoes, loops, algoritmos | "O XP do aluno e uma variavel. O loop roda para cada conceito" |
+| 2 | HTML | Tags, semantica, formularios | "A landing page do Koda e feita de HTML" |
+| 3 | CSS | Seletores, flexbox, grid, responsivo | "O dashboard do Koda usa CSS para ficar bonito" |
+| 4 | Git & GitHub | Commits, branches, PRs | "O codigo do Koda esta no GitHub" |
+| 5 | Terminal | Navegacao, comandos, scripts | "Para rodar o Koda: npm run dev" |
+| 6 | Como a web funciona | HTTP, DNS, cliente/servidor, APIs | "Quando voce manda msg, uma API recebe" |
+
+### Fase 2 — JavaScript & TypeScript (Semanas 7-12)
+
+| # | Modulo | Conceitos | Conexao com o Koda |
+|---|--------|-----------|--------------------|
+| 7 | JS Fundamentos | Tipos, funcoes, arrays, objetos | "A lista de badges do Koda e um array" |
+| 8 | JS Intermediario | DOM, eventos, fetch | "O botao do playground chama fetch" |
+| 9 | JS Avancado | Async/await, promises, closures | "Quando o Koda manda msg pro Claude, e um await" |
+| 10 | TypeScript | Tipos, interfaces, generics | "Interface User tem phone, name, level..." |
+| 11 | Projeto: App interativo | Aplicacao real no browser | "Mini-versao do quiz do Koda" |
+
+### Fase 3 — Backend (Semanas 13-20)
+
+| # | Modulo | Conceitos | Conexao com o Koda |
+|---|--------|-----------|--------------------|
+| 12 | Node.js | Runtime, npm, modulos, event loop | "O backend do Koda roda em Node.js" |
+| 13 | API REST | Rotas, HTTP methods, middleware | "POST /webhook/evolution recebe suas mensagens" |
+| 14 | Banco de Dados | SQL, Postgres, queries, joins | "SELECT * FROM progress WHERE user_id = 'voce'" |
+| 15 | ORM | Prisma ou Drizzle, migrations | "O Koda usa Supabase client para queries tipadas" |
+| 16 | Autenticacao | JWT, sessions, OAuth | "Quando voce loga no web app, e assim que funciona" |
+| 17 | Projeto: API completa | API com auth, CRUD, banco | "API que funciona igual ao Koda" |
+
+### Fase 4 — Frontend Moderno (Semanas 21-28)
+
+| # | Modulo | Conceitos | Conexao com o Koda |
+|---|--------|-----------|--------------------|
+| 18 | React | Componentes, state, hooks | "O mapa visual e um componente React" |
+| 19 | Next.js | App Router, SSR, Server Components | "O web app do Koda e Next.js" |
+| 20 | Tailwind CSS | Utility-first, design system | "Classes CSS do Koda sao Tailwind: bg-zinc-900" |
+| 21 | Formularios | Validacao, React Hook Form, Zod | "Formulario de onboarding usa RHF + Zod" |
+| 22 | Projeto: App full-stack | Next.js + API + banco | "Dashboard do Koda do zero" |
+
+### Fase 5 — Construindo SEU SaaS (Semanas 29-36)
+
+| # | Modulo | Conceitos | Conexao com o Koda |
+|---|--------|-----------|--------------------|
+| 23 | Arquitetura SaaS | Multi-tenant, planos, billing | "O Koda tem planos Free/Basic/Pro" |
+| 24 | Supabase | Auth + DB + storage + RLS | "Voce vai usar RLS no SEU produto" |
+| 25 | Stripe | Checkout, assinaturas, webhooks | "Qualquer SaaS precisa de pagamento" |
+| 26 | Email transacional | Resend, templates | "Notificacoes e onboarding por email" |
+| 27 | Landing page + SEO | Marketing, conversao | "Qualquer produto precisa de landing" |
+| 28 | Dashboard admin | Metricas, gestao | "Todo SaaS precisa de dashboard" |
+| 29 | IA no SaaS | AI SDK, Claude API | "IA e o diferencial de 2026" |
+| 30 | PROJETO FINAL | SEU SaaS do zero ao deploy | "Nao e o Koda. E a SUA ideia." |
+
+### Metricas do Curriculo
+
+| Metrica | Valor |
+|---------|-------|
+| Total de modulos | 30 |
+| Total de conceitos (~5/modulo) | 150 |
+| Total de exercicios (~4/modulo) | 120 |
+| Mini-projetos | 30 |
+| Projetos maiores (1/fase) | 5 |
+| Duracao estimada | 6-8 meses |
+
+---
+
+## 7. User Flows
+
+### Flow 1: Primeiro Contato (Onboarding)
+
+```
+Aluno → "Oi" → Koda se apresenta →
+Pergunta 1 (objetivo) → Resposta →
+Pergunta 2 (nivel) → Resposta →
+Pergunta 3 (disponibilidade) → Resposta →
+Pergunta 4 (nome) → Resposta →
+"Seu roadmap esta pronto! Vamos comecar?" →
+Primeira aula: Logica de Programacao
+```
+
+### Flow 2: Sessao de Estudo (Aula Completa)
+
+```
+Aluno → "Vamos la" (mood: focado) →
+HUB → LESSON_EXPLAIN (Koda explica conceito com analogia) →
+GATE_1 ("Me explica com suas palavras") →
+  Se aprovado → GATE_2 (exercicio de codigo) →
+    Se acertou → GATE_3 (desafio combinado) →
+      Se acertou → HUB (+XP, badge check, progress bar) →
+        "Conceito dominado! Proximo?"
+    Se errou (ate 3x) → Feedback progressivo → Tenta de novo
+  Se nao compreendeu → Re-explicacao com outra analogia → GATE_1 novamente
+```
+
+### Flow 3: Sessao de 30 Segundos (Dia Ruim)
+
+```
+Aluno → "Cansei" →
+Koda: "Tudo bem! Quiz de 1 pergunta?" →
+Aluno → Responde →
+"+15 XP! Streak mantido! Te vejo amanha."
+```
+
+### Flow 4: Retorno Apos Inatividade
+
+```
+Aluno (voltou apos 2 semanas) → "Oi" →
+Koda: "Bem-vindo de volta! Voce ja domina 8 conceitos.
+ Que tal revisar os 2 ultimos? Quiz de 1 minuto." →
+Aluno responde quiz → "Lembrou tudo! Vamos continuar de onde parou."
+```
+
+### Flow 5: Web App (Dashboard)
+
+```
+Aluno abre web → Login com telefone (magic link via WhatsApp) →
+Dashboard: XP total, streak, nivel, conceitos dominados →
+Roadmap: mapa visual com ilhas (clica para ver conceitos) →
+Playground: editor Monaco com templates do Koda →
+Badges: colecao de conquistas
+```
+
+---
+
+## 8. Metricas de Sucesso
+
+### Metricas de Produto
+
+| Metrica | Meta MVP | Meta 6 meses |
+|---------|----------|-------------|
+| Retencao dia 7 | > 60% | > 75% |
+| Retencao dia 30 | > 40% | > 55% |
+| Retencao dia 90 | > 25% | > 40% |
+| Media sessoes/semana | > 3 | > 4 |
+| Taxa de reentry (voltou apos inatividade) | > 30% | > 45% |
+| Alunos que passam da Fase 1 | > 40% | > 55% |
+| Alunos que completam ate Fase 3 | > 15% | > 25% |
+| Streak medio | > 5 dias | > 10 dias |
+
+### Metricas Founder-First (Pedro)
+
+| Metrica | Meta | Prazo |
+|---------|------|-------|
+| Pedro completa Fase 1 | Entende fundamentos | Semana 6 |
+| Pedro le codigo do Koda | Entende o produto | Semana 10 |
+| Pedro faz primeira mudanca | Primeiro commit real | Semana 16 |
+| Pedro implementa feature | Developer junior | Semana 24 |
+| Pedro cria SEU SaaS | Autonomia total | Semana 36 |
+
+### Metricas de Negocio
+
+| Metrica | Meta |
+|---------|------|
+| LTV:CAC | > 3:1 |
+| MRR (100 alunos pagos) | R$ 4.900 - R$ 9.700 |
+| Churn mensal | < 10% |
+| NPS | > 40 |
+| Custo por aluno/mes | < R$ 5,00 |
+
+---
+
+## 9. Fases de Implementacao
+
+### Fase 1 — MVP Core (Semanas 1-4)
+
+**Foco: core que Pedro vai usar como aluno #1**
+
+- [ ] Setup projeto (package.json, tsconfig, estrutura de pastas)
+- [ ] Schema Supabase (migrations para users, progress, sessions, interactions, gamification)
+- [ ] RLS policies
+- [ ] Webhook Evolution API → Hono
+- [ ] Intent Classifier (Claude Haiku, 14 intents)
+- [ ] State Machine basica (IDLE, ONBOARDING, HUB, LESSON, GATE_1, GATE_2)
+- [ ] AI Engine (Claude Sonnet com system prompts em 6 camadas)
+- [ ] Context Builder
+- [ ] Response Formatter (WhatsApp markup)
+- [ ] Onboarding flow (4 perguntas)
+- [ ] Primeira aula (Logica de programacao — conceitos + portoes 1 e 2)
+- [ ] XP basico (Pedro ve progresso)
+- [ ] Deploy na VPS com PM2
+
+### Fase 2 — Anti-Abandono + Gamificacao (Semanas 5-8)
+
+**Foco: se Pedro abandonar na semana 3, o projeto morre**
+
+- [ ] Formato rotator (8 formatos, anti-monotonia)
+- [ ] Sistema de XP completo + streak + regra dos 30 segundos
+- [ ] Badges
+- [ ] Mood selector (focado/de boa/quero jogar/cansei)
+- [ ] Re-engajamento proativo (cascata de mensagens)
+- [ ] Zero culpa (re-entry handler)
+- [ ] Dificuldade adaptativa
+- [ ] Portao 3
+- [ ] Modulos 2-3 (HTML, CSS)
+- [ ] Web App: dashboard + login (Supabase Auth)
+- [ ] Web App: mapa visual (roadmap gamificado)
+
+### Fase 3 — Conteudo + Polish (Semanas 9-12)
+
+- [ ] Modulos 4-6 (Git, Terminal, Como a web funciona)
+- [ ] Code playground (web, Monaco editor)
+- [ ] Audio (Whisper integration)
+- [ ] Notificacoes/lembretes
+- [ ] Spaced repetition
+- [ ] Dropout Risk Score (modelo preditivo)
+- [ ] Progresso visivel (barras, summaries, relatorio semanal)
+
+### Fase 4 — Monetizacao (Semanas 13-16)
+
+- [ ] Stripe integration
+- [ ] Planos (free trial 7 dias, Basic R$ 49/mes, Pro R$ 97/mes)
+- [ ] Limites por plano
+- [ ] Dashboard admin (metricas do negocio)
+- [ ] "Abrir o capo" — feature educacional que mostra codigo real do Koda
+
+---
+
+## 10. Estimativa de Custos
+
+### MVP (100 alunos)
+
+| Servico | Custo Mensal | Notas |
+|---------|-------------|-------|
+| VPS | Ja tem | Evolution + Hono rodam na VPS existente |
+| Supabase | $0 (free tier) | Ate 50k rows, 500MB, 50k auth users |
+| Claude Sonnet | ~$50-100 | ~5 msgs/dia/aluno x 100 alunos x ~$0.003/msg |
+| Claude Haiku | ~$5-10 | Classificador, muito barato |
+| Whisper | ~$5-10 | Se 20% das msgs forem audio |
+| Vercel | $0 (hobby) | Free tier para web app |
+| Dominio | ~$10/ano | koda.app ou similar |
+| **TOTAL** | **~$70-130/mes** | |
+
+### Custo por Aluno
+
+| Cenario | Custo/aluno/mes |
+|---------|----------------|
+| 100 alunos | ~$0.70-1.30 |
+| 500 alunos | ~$0.50-0.80 |
+| 1000 alunos | ~$0.40-0.60 |
+
+---
+
+## 11. Matriz de Riscos
+
+| Risco | Probabilidade | Impacto | Mitigacao |
+|-------|-------------|---------|-----------|
+| Claude API fora do ar | Baixa | Alto | Mensagem fallback "Voltamos em breve", retry 1x |
+| Custo de API explode com escala | Media | Alto | Rate limit, cache de respostas comuns, monitoramento |
+| Evolution API instavel | Media | Alto | Health check + restart automatico (PM2) |
+| Pedro abandona na semana 3 | Media | Critico | Anti-dropout ativado desde semana 1, sprint 2 dedicado |
+| Aluno faz prompt injection | Alta | Baixo | System prompt robusto + guardrails |
+| Latencia > 15s | Media | Medio | Timeout + indicador "digitando..." + fila |
+| Supabase free tier insuficiente | Baixa (MVP) | Medio | Upgrade quando necessario (~$25/mes) |
+| Qualidade do ensino insatisfatoria | Media | Alto | Pedro testa como aluno #1, feedback loop continuo |
+| WhatsApp bloqueia numero | Baixa | Alto | Seguir politicas de uso, nao enviar spam |
+
+---
+
+## 12. Schema do Banco de Dados (Visao de Alto Nivel)
+
+### Tabelas Principais
+
+| Tabela | Descricao | RLS |
+|--------|-----------|-----|
+| `users` | Perfil do aluno (phone, name, objective, level, plan) | Sim |
+| `progress` | Progresso por conceito (gate_1/2/3_status, mastery_level) | Sim |
+| `sessions` | Estado da conversa FSM (current_state, mood, context_stack) | Sim |
+| `interactions` | Historico de mensagens (msg_in, msg_out, intent, tokens, latencia) | Sim |
+| `gamification` | XP, streak, badges, nivel, koda_coins | Sim |
+| `modules` | Curriculo — modulos (fase, nome, prerequisitos) | Publico (leitura) |
+| `concepts` | Curriculo — conceitos (explicacao, analogia, exercicios, criterios) | Publico (leitura) |
+| `reengagement_log` | Log de mensagens de re-engajamento enviadas | Sim |
+| `difficulty_signals` | Sinais de dificuldade por sessao | Sim |
+
+---
+
+## 13. Estrutura do Repositorio
+
 ```
 koda/
-├── backend/          # API Node + Express
-├── prompts/          # System prompts do professor IA
-├── db/               # Migrations Supabase
-├── scripts/          # Utilitários (seed, analytics)
-├── docs/             # PRD, Brief, arquitetura
-└── .env.example      # Template de env vars
+├── src/
+│   ├── index.ts                    # Entry point — Hono server
+│   ├── routes/
+│   │   ├── webhook.ts              # POST /webhook/evolution
+│   │   ├── health.ts               # GET /health
+│   │   └── api/                    # Endpoints para web app
+│   ├── core/
+│   │   ├── classifier.ts           # Intent classifier (Haiku)
+│   │   ├── state-machine.ts        # Conversation FSM
+│   │   ├── context-builder.ts      # Monta prompt em 6 camadas
+│   │   ├── ai-engine.ts            # Claude Sonnet
+│   │   └── response-formatter.ts   # WhatsApp markup
+│   ├── modules/
+│   │   ├── onboarding/             # Fluxo de onboarding
+│   │   ├── lesson/                 # Fluxo de aula + gate evaluator
+│   │   ├── exercise/               # Correcao de codigo
+│   │   ├── quiz/                   # Quiz relampago, ache-o-bug
+│   │   ├── doubt/                  # Modo duvida rapida
+│   │   └── gamification/           # XP, streaks, badges
+│   ├── services/
+│   │   ├── evolution.ts            # Client Evolution API
+│   │   ├── supabase.ts             # Client Supabase
+│   │   ├── claude.ts               # Client Claude (Sonnet + Haiku)
+│   │   └── whisper.ts              # Client Whisper
+│   ├── db/
+│   │   ├── schema.ts               # Tipos TypeScript
+│   │   └── queries/                # CRUD por entidade
+│   └── utils/
+│       ├── rate-limiter.ts
+│       ├── logger.ts
+│       └── constants.ts
+├── prompts/                         # System prompts versionados (.md)
+├── curriculum/                      # Conteudo curricular (YAML)
+│   ├── modules/                     # 01-logica.yaml ... 30-projeto-final.yaml
+│   └── index.yaml                   # Indice com prerequisitos
+├── web/                             # Next.js 16 Web App (Vercel)
+│   └── src/app/                     # App Router pages
+├── db/
+│   └── migrations/                  # SQL migrations para Supabase
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   └── fixtures/
+├── docs/
+│   ├── architecture/
+│   ├── prd.md                       # ESTE DOCUMENTO
+│   ├── product-vision.md
+│   ├── curriculum-structure.md
+│   └── progression-system.md
+├── package.json
+├── tsconfig.json
+└── .env.example
 ```
 
-### Service Architecture
-**Serverless + Database:** Sem servidor sempre ligado
+---
+
+## 14. Deploy
+
+### Backend (VPS)
 
 ```
-WhatsApp API
-    ↓
-Webhook (Node/Express) — recebe mensagem
-    ↓
-Supabase (user lookup, context retrieval)
-    ↓
-Claude API (call com system prompt + context)
-    ↓
-Supabase (store session, exercise result)
-    ↓
-WhatsApp API — envia resposta
+GitHub → Push to main → GitHub Actions → SSH deploy to VPS
+                                          ├── npm install
+                                          ├── npm run build
+                                          ├── pm2 restart koda
+                                          └── health check
 ```
 
-**Por que serverless:**
-- Menos custo inicial
-- Escalável (automaticamente adiciona capacity)
-- Deployment simples
+- PM2 gerencia o processo Hono na VPS (port 3333)
+- Nginx como reverse proxy (HTTPS)
 
-### Testing Requirements
-**Unit + Integration (sem e2e manual na V1)**
+### Web App (Vercel)
 
-| Nível | Foco | Tools |
-|---|---|---|
-| **Unit** | Funções de parsing, cálculo de progresso | Jest |
-| **Integration** | Webhook → Supabase → Claude → Resposta | Node + Supertest |
-| **Manual** | Conversa natural, qualidade das respostas | 5 beta users por 1 semana |
+```
+GitHub (branch main, pasta web/) → Vercel auto-deploy
+```
 
-**Não fazer na V1:**
-- e2e automatizados (difícil testar conversa natural)
-- Testes de carga (MVPs não são scale-tested)
-- Testes de segurança (fazer depois com pentest real)
+- Root directory: `web/`
+- Framework: Next.js (auto-detected)
+- Env vars: SUPABASE_URL, SUPABASE_ANON_KEY
 
-### Additional Technical Assumptions
+### Banco (Supabase)
 
-1. **Claude é melhor que GPT-4 para educação** — mais empático, explica melhor
-2. **Embeddings simples (sem RAG) na V1** — histórico direto é suficiente
-3. **Supabase é viável para 1k alunos** — escalável e barato
-4. **WhatsApp API via Twilio é mais fácil que Z-API** — permite testes mais cedo
-5. **Custo de API < R$ 2/aluno/mês** — viável com otimização de prompts
-6. **Memoria de contexto cabe em 1 query** — na V1, histórico simples sem embeddings complexas
-7. **Sem integração com IDEs na V1** — aluno submete código por texto/print
-8. **Sem modo grupo** — apenas 1-to-1 para focar em qualidade
+- Migrations versionadas em `db/migrations/`
+- Aplicar com `supabase db push`
+- Backups automaticos gerenciados pelo Supabase
 
 ---
 
-## 5. Epic List
-
-**Objetivo:** Sequência lógica e independente de desenvolvimento, cada epic entrega valor
-
-### Epic 1: Foundation & MVP Core
-**Objetivo:** Estrutura base + conversa funcional com aluno (sem memória complexa)
-- Webhook WhatsApp → Claude → resposta
-- Onboarding simples (4 perguntas)
-- Aula básica (explicação + exercício)
-- Armazenamento simples no Supabase
-- Deploy em Railway/Render
-
-**Valor:** Prova o conceito — aluno consegue aprender conceitos via WhatsApp
-
----
-
-### Epic 2: Memory & Continuity
-**Objetivo:** Professor lembra do aluno, retoma de onde parou
-- Sistema de usuários + sessões persistentes
-- Recuperação de histórico por query
-- Roadmap personalizado (sequência de tópicos)
-- Revisão de progresso
-
-**Valor:** Aluno não precisa repetir informações, educação é contínua
-
----
-
-### Epic 3: Exercise & Feedback Loop
-**Objetivo:** Exercícios práticos, correção de código, avaliação
-- Parsing de código submetido
-- Detecção de bugs e erros
-- Feedback line-by-line
-- Marcação de exercícios como completos
-
-**Valor:** Aprendizado prático — aluno consegue fazer código real e receber feedback
-
----
-
-### Epic 4: Monetização & Painel Admin
-**Objetivo:** Cobrar de alunos, monitorar métricas
-- Integração com Stripe/PagSeguro
-- Planos (Free/Básico/Pro)
-- Limite de uso por plano
-- Dashboard de admin (métricas, alunos, churn)
-
-**Valor:** Modelo de negócio viável, sustentabilidade
-
----
-
-### Epic 5: Escalabilidade & Polimento
-**Objetivo:** Otimizar performance, adicionar refinamentos UX
-- Cache de respostas comuns
-- Embeddings para RAG (melhor contexto)
-- Notificações (lembretes de estudo)
-- Analytics (cohort analysis, churn prediction)
-
-**Valor:** Preparar para 10k+ alunos, manter qualidade
-
----
-
-## 6. Epic Details
-
-### Epic 1: Foundation & MVP Core
-
-**Objetivo:** Estabelecer a estrutura mínima para uma conversa educacional funcional via WhatsApp, permitindo que um aluno novo faça onboarding, receba uma aula inicial e complete um exercício.
-
-#### Story 1.1: Setup WhatsApp Webhook + Claude Integration
-
-**Como um** desenvolvedor,
-**Quero** que webhook receba mensagens do WhatsApp e resonda usando Claude,
-**Para que** a conversa base funcione.
-
-**Acceptance Criteria:**
-1. Webhook endpoint (`POST /api/webhook/whatsapp`) criado e testado
-2. Validação de origem do WhatsApp (signature verification) funcionando
-3. Mensagem recebida → passada para Claude API com system prompt
-4. Resposta do Claude → formatada e enviada de volta via WhatsApp API
-5. Logs de todas as interações salvos no Supabase
-6. Tratamento de erro: se Claude demora > 5s, retorna "Estou processando... aguarde"
-7. Rate limiting: máx 10 mensagens/minuto por usuário
-8. Testes: Unit (parsing), Integration (webhook → Claude → resposta)
-
-**Notas técnicas:**
-- Usar Twilio Sandbox para testes iniciais
-- System prompt: neutro, educacional, sem memória ainda
-- Supabase: tabela `interactions` (user_id, message_in, message_out, timestamp)
-
----
-
-#### Story 1.2: Onboarding Flow — Capturar Perfil do Aluno
-
-**Como um** aluno novo,
-**Quero** que o professor me faça perguntas para entender meu objetivo,
-**Para que** um roadmap personalizado seja criado.
-
-**Acceptance Criteria:**
-1. Primeira mensagem dispara onboarding automático
-2. Sequência de 4 perguntas (objetivo, nível, tempo, nome):
-   - "Qual é seu objetivo? (a) Aprender do zero, (b) Mudar de carreira, (c) Criar um produto"
-   - "Qual seu nível atual? (a) Nunca programei, (b) Fiz HTML básico, (c) Sei JavaScript"
-   - "Quanto tempo por dia? (a) 15 min, (b) 30 min, (c) 1h+, (d) Varia"
-   - "Como você se chama?"
-3. Cada pergunta aguarda resposta antes de próxima (conversa sequencial)
-4. Armazena respostas no Supabase (`users` table)
-5. Ao final: "Perfeito! Seu roadmap: [sequência personalizada]. Vamos começar?"
-6. Testes: Simular 3 tipos de alunos (iniciante procurando emprego, intermediário com projeto, gestor)
-
----
-
-#### Story 1.3: Aula Básica — Explicação + Exercício
-
-**Como um** aluno com perfil criado,
-**Quero** receber uma aula (explicação + exercício),
-**Para que** eu aprenda um conceito e o coloque em prática.
-
-**Acceptance Criteria:**
-1. Aula começa com contexto: "Você já sabe X, vamos para Y"
-2. Explicação em máx 3 parágrafos (analogias simples)
-3. Exemplo de código fornecido
-4. Pergunta de compreensão: "Você entendeu?" ou "Consegue resumir?"
-5. Aguarda resposta do aluno
-6. Baseado na resposta:
-   - Se entendeu: avança para exercício
-   - Se não entendeu: re-explica com outro ângulo
-7. Exercício proposto: "Agora sua vez: [desafio específico]"
-8. Aguarda código do aluno
-9. Se código está correto: "✅ Perfeito! Agora vamos pro próximo conceito"
-10. Se errado: "Quase lá! Linha 3 tem um erro. [Feedback específico]"
-11. Armazena tudo no Supabase (`sessions` table)
-12. Testes: Testar 3 caminhos (entendeu → exercício correto, não entendeu → re-explicação, exercício errado → feedback)
-
----
-
-#### Story 1.4: Supabase Schema + Data Model
-
-**Como um** desenvolvedor,
-**Quero** ter um schema Supabase definido e migração rodada,
-**Para que** dados do aluno sejam persistidos corretamente.
-
-**Acceptance Criteria:**
-1. Schema criado:
-   - `users` (id, phone, name, objective, level, availability, created_at)
-   - `sessions` (id, user_id, topic, messages[], exercises_completed, created_at)
-   - `interactions` (id, user_id, message_in, message_out, metadata, timestamp)
-2. RLS habilitado (cada user vê apenas seus dados)
-3. Índices otimizados (user_id, created_at)
-4. Migrations versionadas em `/db/migrations/`
-5. Schema documentado em `docs/database.md`
-6. Testes: Validar RLS com 2 usuários diferentes
-
----
-
-#### Story 1.5: Deploy em Railway/Render
-
-**Como um** desenvolvedor,
-**Quero** ter a API deployada em um servidor live,
-**Para que** o bot funcione em produção.
-
-**Acceptance Criteria:**
-1. Variáveis de ambiente configuradas (TWILIO_*, CLAUDE_*, DATABASE_URL)
-2. GitHub Actions ou manual deploy para Railway/Render
-3. Build process documentado
-4. Logs acessíveis (Sentry or Railway dashboard)
-5. Health check endpoint: `GET /health` retorna 200
-6. Rollback plan documentado
-7. Testes: Deploy → enviar mensagem real via WhatsApp → verificar resposta
-
----
-
-### Epic 2: Memory & Continuity
-
-**Objetivo:** Permitir que o professor se lembre do aluno e retome educação de forma natural, mostrando progresso.
-
-#### Story 2.1: Recuperação de Contexto
-
-**Como um** aluno voltando após dias,
-**Quero** que o professor retome de onde paramos,
-**Para que** não precise repetir tudo.
-
-**Acceptance Criteria:**
-1. Aluno volta e manda mensagem (qualquer uma)
-2. Sistema recupera último tópico da sessão anterior
-3. Professor responde: "Oi [nome]! Continuamos onde paramos: você aprendeu HTML. Vamos pro CSS?"
-4. Se foi > 1 semana: "Vamos revisar HTML rapidinho antes?"
-5. Contexto (últimas 3 sessões) passado para Claude (system prompt)
-6. Armazena contexto recuperado em logs
-7. Testes: Simular aluno que não usa por 3 dias, depois volta
-
----
-
-#### Story 2.2: Roadmap Personalizado
-
-**Como um** aluno,
-**Quero** ver meu roadmap (sequência de tópicos),
-**Para que** eu saiba onde estou e para onde vou.
-
-**Acceptance Criteria:**
-1. Roadmap criado durante onboarding (baseado em objetivo + nível)
-2. Exemplos:
-   - Iniciante: "Semana 1: HTML Basics → 2: CSS → 3: JavaScript Intro → 4: Loops → 5: Funções..."
-   - Intermediário: "Semana 1: OOP → 2: Async/Await → 3: APIs → ..."
-3. Aluno pergunta: "Qual é meu roadmap?" → Professor mostra formatado
-4. Roadmap atualiza conforme exercícios são completos
-5. Testes: 3 tipos de alunos, verificar roadmaps diferentes
-
----
-
-#### Story 2.3: Visualização de Progresso
-
-**Como um** aluno,
-**Quero** saber quanto já completei,
-**Para que** eu veja meu avanço e fico motivado.
-
-**Acceptance Criteria:**
-1. Tracking de exercícios completados por tópico
-2. Aluno pergunta: "Qual é meu progresso?" ou "Como vou?"
-3. Professor retorna:
-   ```
-   📊 Seu progresso:
-   ✅ HTML Basics (3/3 exercícios)
-   ✅ CSS (2/3 exercícios)
-   🔄 JavaScript Intro (1/5 exercícios)
-
-   Você está na semana 3 de 10.
-   ```
-4. Progresso salvo em `sessions.exercises_completed` (array)
-5. Testes: Verificar cálculo de progresso com 5 cenários
-
----
-
-### Epic 3: Exercise & Feedback Loop
-
-**Objetivo:** Implementar correção de código e feedback prático.
-
-#### Story 3.1: Parsing e Análise de Código
-
-**Como um** professor,
-**Quero** que código submetido pelo aluno seja analisado,
-**Para que** eu encontre erros e dê feedback.
-
-**Acceptance Criteria:**
-1. Aluno submete código (em bloco de texto ou foto)
-2. Sistema detecta linguagem (HTML, CSS, JavaScript, Python)
-3. Claude analisa código:
-   - Identifica bugs (erros sintáticos, lógicos)
-   - Encontra warnings (boas práticas)
-   - Compara com solução esperada (se existe)
-4. Armazena análise em `sessions.code_analysis`
-5. Testes: Submeter código com 5 tipos de erros diferentes
-
----
-
-#### Story 3.2: Feedback Linha a Linha
-
-**Como um** aluno com código errado,
-**Quero** entender exatamente o que errei,
-**Para que** eu corrija e aprenda.
-
-**Acceptance Criteria:**
-1. Feedback estruturado:
-   - "✅ Parte correta: [O que acertou]"
-   - "❌ Erro na linha X: [O que está errado e por quê]"
-   - "💡 Solução: [Código corrigido com destaque das mudanças]"
-   - "🎯 Próximo: [O que tentar depois]"
-2. Nunca apenas "Errado!"
-3. Sempre construtivo e encorajador
-4. Código formatado claramente (blocos, não inline)
-5. Testes: Gerar feedback para 3 códigos errados e validar qualidade
-
----
-
-#### Story 3.3: Modo Dúvida Rápida
-
-**Como um** aluno,
-**Quero** fazer perguntas rápidas fora do contexto da aula,
-**Para que** eu esclareça dúvidas ao aprender.
-
-**Acceptance Criteria:**
-1. Aluno pode pergunta: "O que é closure?" a qualquer momento
-2. Professor responde direto (não interrompe aula)
-3. Resposta adaptada ao nível do aluno (iniciante = analogia, intermediário = técnico)
-4. Exemplo: "Uma closure é uma função que 'lembra' de variáveis do escopo externo. Tipo..."
-5. Armazena pergunta em `interactions` para analytics
-6. Testes: Fazer 10 perguntas variadas e verificar clareza das respostas
-
----
-
-### Epic 4: Monetização & Painel Admin
-
-**Objetivo:** Implementar planos de preço e dashboard básico.
-
-#### Story 4.1: Integração Stripe
-
-**Como um** aluno premium,
-**Quero** pagar via Stripe,
-**Para que** eu acesse planos pagos.
-
-**Acceptance Criteria:**
-1. Planos definidos:
-   - Free: 7 dias (acesso completo, depois expira)
-   - Basic: R$ 49/mês (até 2h estudo/dia, 1 trilha)
-   - Pro: R$ 97/mês (ilimitado, todas trilhas)
-2. Checkout integrado com Stripe
-3. Webhooks: pagamento confirmado → ativar plano no Supabase
-4. Cobrança recorrente
-5. Testes: Mock Stripe webhooks, verificar transições de plano
-
----
-
-#### Story 4.2: Limites por Plano
-
-**Como um** aluno free,
-**Quero** usar o bot livremente por 7 dias,
-**Para que** eu experimente antes de pagar.
-
-**Acceptance Criteria:**
-1. Tracking de dias desde registro
-2. Após 7 dias: "Seu free trial expirou! Escolha um plano para continuar"
-3. Plano Basic: máx 2h conversa/dia (rastreado por timestamp)
-4. Plano Pro: ilimitado
-5. Message de limite: "Você usou seu limite de 2h hoje. Volta amanhã!"
-6. Testes: Simular 3 usuários em planos diferentes
-
----
-
-#### Story 4.3: Dashboard Admin (MVP)
-
-**Como um** founder,
-**Quero** ver métricas básicas do negócio,
-**Para que** eu saiba como está o produto.
-
-**Acceptance Criteria:**
-1. Dashboard simples (web ou Vercel):
-   - Total de usuários (free vs paid)
-   - MRR (Monthly Recurring Revenue)
-   - Churn (cancelamentos)
-   - Atividade: mensagens/dia
-2. Tabelas: [Usuários], [Sessões], [Revenue]
-3. Filtros por período (últimos 7, 30, 90 dias)
-4. Testes: Verificar cálculos de MRR e churn
-
----
-
-### Epic 5: Escalabilidade & Polimento
-
-**Objetivo:** Otimizar para 10k+ alunos e adicionar refinamentos.
-
-#### Story 5.1: Cache de Respostas Comuns
-
-**Como um** sistema,
-**Quero** cachear respostas frequentes,
-**Para que** reduzir custo de API.
-
-**Acceptance Criteria:**
-1. Detectar perguntas frequentes ("O que é um loop?", "Como fazer um if?")
-2. Armazenar respostas pré-feitas no Redis/Supabase
-3. Se pergunta é common: servir cache (resposta + "Veja também: [link para aprendizado]")
-4. Reduzir chamadas à Claude API em ~30%
-5. Testes: Simular 100 alunos fazendo perguntas repetidas
-
----
-
-#### Story 5.2: Embeddings para RAG (Retrieval-Augmented Generation)
-
-**Como um** professor,
-**Quero** recuperar contexto relevante rapidamente,
-**Para que** respostas sejam mais precisas.
-
-**Acceptance Criteria:**
-1. Histórico de sessões convertido em embeddings (pgvector no Supabase)
-2. Nova mensagem → gera embedding → busca top-5 sessões similares
-3. Contexto das sessões relevantes → passado para Claude
-4. Melhora qualidade de resposta (professor "aprende" padrões do aluno)
-5. Testes: Comparar respostas com/sem RAG, NPS deve melhorar
-
----
-
-#### Story 5.3: Notificações & Lembretes
-
-**Como um** aluno,
-**Quero** receber lembretes para estudar,
-**Para que** eu mantenha consistência.
-
-**Acceptance Criteria:**
-1. Opcionais (aluno habilita na onboarding)
-2. Configurável: notificação às 19h, por exemplo
-3. Método: mensagem WhatsApp ("Oi! Tempo de estudar? Você tem 30 min?")
-4. Frequência: uma por dia
-5. Testes: Simular 10 alunos com diferentes horários, verificar entrega
-
----
-
-## 7. Next Steps
-
-### Immediate Actions (Próximos 7 dias)
-
-1. ✅ **Revisão do PRD** — Pedro lê, confirma escopo e aprova
-2. ✅ **Validação com 3 pessoas** — Mostrar brief + PRD, coletar feedback
-3. 🔄 **Ajustes rápidos** — Baseado em feedback
-4. 🔄 **Kickoff do Desenvolvimento** — Começar Epic 1, Story 1.1
-
-### Development Phases
-
-#### Phase 1: MVP (Semanas 1–8)
-- Epic 1 (Foundation & MVP Core) completo
-- Deploy funcional
-- Testes internos (Pedro testa 2 semanas)
-
-#### Phase 2: Beta (Semanas 8–10)
-- Recruitar 5 beta testers
-- Feedback loop intenso
-- Iterar rapidamente
-
-#### Phase 3: Validação (Semana 10)
-- Métricas críticas: Retention Day 7 > 40%, NPS > 40
-- Go/No-go decision
-- Se Go: abrir para 20 pagos (lista de espera)
-- Se No-go: pivotar ou refinar
-
-#### Phase 4: Scale (Semanas 11–24)
-- Epic 2 (Memory) → 3 (Feedback) → 4 (Monetização)
-- Atingir 100 usuários
-- Otimizar custo por aluno
-- Preparar para escala
-
-### PM Handoff
-
-Este PRD fornece o blueprint completo do **Koda**. Os próximos passos são:
-
-1. **Validação de mercado** — confirmar que alunos realmente querem isso
-2. **Desenvolvimento de Epic 1** — 8 semanas de iteração
-3. **Teste com 5 beta users** — real feedback
-4. **Tomada de decisão** — escalar ou pivotar
-
-**Responsabilidades por fase:**
-- **Product Owner (@po):** Validação, ajustes de scope, priorização
-- **Desenvolvedor (@dev):** Código, testes, deploy
-- **DevOps (@devops):** Infrastructure, CI/CD, monitoring
+## 15. Diferencial Competitivo
+
+| Mercado Tradicional | Koda |
+|---------------------|------|
+| Video de 2h | Sessao de 3 minutos |
+| Mesmo formato sempre | 8 formatos que variam toda sessao |
+| Lista de modulos | Mapa visual tipo jogo (ilhas) |
+| "Assistiu" = progresso | 3 portoes = demonstracao real |
+| So uma plataforma | WhatsApp + Web sincronizados |
+| Passivo (assiste) | Ativo (responde, coda, explica) |
+| Sem recompensa | XP, streaks, badges, niveis |
+| Ritmo fixo | Adapta ao humor/energia do dia |
+| Ignora neurodivergencia | Desenhado para TDAH (7 mecanismos anti-dropout) |
+| Pune abandono | Celebra retorno (zero culpa) |
 
 ---
 
 ## Metadata
 
-- **Versão PRD:** 1.0
-- **Status:** Draft (pronto para validação)
-- **Próximo Review:** Após validação com 3 pessoas
-- **Última atualização:** 29 de março de 2026
-- **Mantido por:** Pedro Caetano
+- **Versao PRD:** 2.0
+- **Status:** Aprovado
+- **Stack:** Evolution API v2 + Hono + Supabase + Claude Sonnet 4 / Haiku 4.5 + Next.js 16 + Whisper
+- **Ultima atualizacao:** 29 de marco de 2026
+- **Mantido por:** Morgan (@pm)
