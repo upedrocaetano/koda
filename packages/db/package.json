@@ -1,0 +1,15 @@
+{
+  "name": "@koda/db",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@koda/shared": "*",
+    "@koda/gamification": "*",
+    "@supabase/supabase-js": "^2.49.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}

@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   Matrix Design System — CSS Variables
+   ============================================================================ */
+
+@theme {
+  /* Backgrounds */
+  --color-matrix-bg: #0D0D0D;
+  --color-matrix-surface: #0A0A0A;
+  --color-matrix-elevated: #111111;
+  --color-matrix-card: #1A1A2E;
+  --color-matrix-input: #16213E;
+
+  /* Greens */
+  --color-matrix-green: #00FF41;
+  --color-matrix-green-dim: #00CC33;
+  --color-matrix-green-dark: #00A028;
+  --color-matrix-green-deep: #006618;
+  --color-matrix-green-shadow: #003D0F;
+
+  /* Accents */
+  --color-matrix-accent: #E94560;
+  --color-matrix-gold: #FFD700;
+  --color-matrix-cyan: #00D4FF;
+
+  /* Text */
+  --color-matrix-white: #E0E0E0;
+  --color-matrix-muted: rgba(0, 255, 65, 0.3);
+
+  /* Fonts */
+  --font-mono: 'Share Tech Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  --font-display: 'Orbitron', sans-serif;
+}
+
+/* Global styles */
+body {
+  background-color: var(--color-matrix-bg);
+  color: var(--color-matrix-white);
+  font-family: var(--font-mono);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-matrix-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-matrix-green-deep);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-matrix-green-dark);
+}
+
+/* Selection */
+::selection {
+  background: rgba(0, 255, 65, 0.3);
+  color: #00FF41;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

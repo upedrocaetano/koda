@@ -57,3 +57,6 @@ coverage/
 
 # Railway
 railway-config.json
+
+# Turbo
+.turbo/
