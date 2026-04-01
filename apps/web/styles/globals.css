@@ -29,8 +29,10 @@
   --color-matrix-muted: rgba(0, 255, 65, 0.3);
 
   /* Fonts */
-  --font-mono: 'Share Tech Mono', 'JetBrains Mono', 'Fira Code', monospace;
-  --font-display: 'Orbitron', sans-serif;
+  --font-mono: var(--font-mono), 'Share Tech Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  --font-display: var(--font-display), 'Orbitron', sans-serif;
+  --font-sans: var(--font-sans), 'Inter', system-ui, sans-serif;
+  --font-code: var(--font-code), 'Fira Code', 'JetBrains Mono', monospace;
 }
 
 /* Global styles */

@@ -1,26 +1,66 @@
 import { calculateLevel } from '@koda/gamification'
+import {
+  MatrixButton,
+  MatrixCard,
+  MatrixBadge,
+  MatrixProgressBar,
+} from '@/components/ui'
 
 export default function Home() {
-  // Teste: importa função pura do package compartilhado
-  const level = calculateLevel(0)
+  const level = calculateLevel(180)
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
-      <h1 className="font-display text-4xl font-bold text-matrix-green mb-4"
-          style={{ textShadow: '0 0 10px #00FF41, 0 0 20px #00FF41' }}>
+    <main className="relative flex min-h-screen flex-col items-center justify-center p-8">
+      <h1
+        className="font-display text-5xl font-bold text-matrix-green mb-2"
+        style={{ textShadow: '0 0 10px #00FF41, 0 0 20px #00FF41' }}
+      >
         KODA
       </h1>
-      <p className="text-matrix-green-dim text-lg mb-8">
+      <p className="text-matrix-green-dim text-lg mb-10">
         Professor de Programação com IA
       </p>
-      <div className="border border-matrix-green-dark/30 rounded-md p-6 bg-matrix-surface">
-        <p className="text-matrix-muted text-sm">
-          Nível {level.level}: {level.title}
-        </p>
-        <p className="text-matrix-green mt-2 text-xs">
-          Sistema online. Aguardando conexão...
-        </p>
+
+      <div className="grid w-full max-w-2xl gap-6">
+        <MatrixCard
+          header={
+            <div className="flex items-center justify-between">
+              <span className="text-matrix-green text-sm font-medium">
+                Nível {level.level}: {level.title}
+              </span>
+              <MatrixBadge variant="level" label={`Nível ${level.level}`} />
+            </div>
+          }
+        >
+          <MatrixProgressBar
+            value={(180 / 500) * 100}
+            label="XP para próximo nível"
+            showPercentage
+          />
+          <div className="mt-4 flex gap-2">
+            <MatrixBadge variant="xp" label="180 XP" />
+            <MatrixBadge variant="streak" label="3 dias" />
+          </div>
+        </MatrixCard>
+
+        <MatrixCard scanlines>
+          <p className="text-matrix-green-dim text-sm italic mb-1">
+            &ldquo;Não existe colher. Existe apenas o código.&rdquo;
+          </p>
+          <p className="text-matrix-muted text-xs">— Koda</p>
+        </MatrixCard>
+
+        <div className="flex flex-wrap gap-3">
+          <MatrixButton variant="primary">Começar aula</MatrixButton>
+          <MatrixButton variant="secondary">Ver progresso</MatrixButton>
+          <MatrixButton variant="ghost">Configurações</MatrixButton>
+          <MatrixButton variant="danger">Sair</MatrixButton>
+        </div>
       </div>
+
+      <p className="mt-10 text-matrix-muted text-xs">
+        Sistema online. Aguardando conexão...
+      </p>
     </main>
   )
 }
