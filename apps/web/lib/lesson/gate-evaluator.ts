@@ -1,7 +1,7 @@
 // Avaliador de Portões para Web App
 // Adaptado de src/modules/lesson/gate-evaluator.ts
 
-import { openai } from '@/lib/openai'
+import { getOpenAI } from '@/lib/openai'
 
 export interface GateResult {
   passed: boolean
@@ -66,7 +66,7 @@ Aceite variações válidas (let/const/var, aspas simples/duplas, etc).
 Se tentativa ${attempts} de ${maxAttempts} e errado, ${attempts >= maxAttempts ? 'mostre a solução (inclua no feedback)' : 'dê dica progressiva'}.`
     }
 
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: 'gpt-4o-mini',
       max_tokens: 500,
       messages: [

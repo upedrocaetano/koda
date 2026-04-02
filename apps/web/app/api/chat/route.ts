@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { openai } from '@/lib/openai'
+import { getOpenAI } from '@/lib/openai'
 import { evaluateGate } from '@/lib/lesson/gate-evaluator'
 import { buildLessonContext } from '@/lib/lesson/context-builder'
 import {
@@ -168,7 +168,7 @@ export async function POST(request: Request) {
         supabase, userId,
       )
 
-      const aiResponse = await openai.chat.completions.create({
+      const aiResponse = await getOpenAI().chat.completions.create({
         model: 'gpt-4o-mini',
         max_tokens: 1024,
         messages: [
@@ -359,7 +359,7 @@ async function generateHubResponse(
       .map(m => `${m.role === 'user' ? 'Aluno' : 'Koda'}: ${m.content}`)
       .join('\n') || ''
 
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: 'gpt-4o-mini',
       max_tokens: 800,
       messages: [
