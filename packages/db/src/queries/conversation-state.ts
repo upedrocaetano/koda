@@ -1,7 +1,7 @@
 // Queries para tabela conversation_state
 
-import { supabase } from '../client.js'
-import type { ConversationState } from '../schema.js'
+import { supabase } from '../client'
+import type { ConversationState } from '../schema'
 
 export async function getState(userId: string): Promise<ConversationState | null> {
   const { data, error } = await supabase

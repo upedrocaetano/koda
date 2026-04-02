@@ -3,7 +3,7 @@
 
 import { supabase } from '@koda/db'
 import { logger } from '@koda/shared'
-import { calculateXP, type XPAction } from './xp-calculator.js'
+import { calculateXP, type XPAction } from './xp-calculator'
 
 export interface StreakResult {
   currentStreak: number

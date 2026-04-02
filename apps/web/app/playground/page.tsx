@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { CodeEditor, DEFAULT_CODE } from '@/components/playground/code-editor'
 import { OutputPanel, type LogEntry } from '@/components/playground/output-panel'
@@ -8,6 +8,14 @@ import { EditorToolbar } from '@/components/playground/editor-toolbar'
 import { CURRICULUM } from '@/lib/lesson/curriculum'
 
 export default function PlaygroundPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-screen bg-matrix-bg text-matrix-green">Carregando editor...</div>}>
+      <PlaygroundContent />
+    </Suspense>
+  )
+}
+
+function PlaygroundContent() {
   const searchParams = useSearchParams()
   const exerciseId = searchParams.get('exercise')
 

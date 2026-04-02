@@ -1,2 +1,2 @@
-export { logger } from './logger.js'
-export { isDuplicate } from './idempotency.js'
+export { logger } from './logger'
+export { isDuplicate } from './idempotency'

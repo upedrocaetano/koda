@@ -1,7 +1,7 @@
 // Queries relacionadas à tabela users
 
-import { supabase } from '../client.js'
-import type { User } from '../schema.js'
+import { supabase } from '../client'
+import type { User } from '../schema'
 
 export async function findUserByPhone(phone: string): Promise<User | null> {
   const { data, error } = await supabase

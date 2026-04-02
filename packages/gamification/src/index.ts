@@ -5,14 +5,14 @@ export {
   calculateLevel,
   type XPAction,
   type LevelInfo,
-} from './xp-calculator.js'
+} from './xp-calculator'
 
 export {
   updateStreak,
   type StreakResult,
-} from './streak-tracker.js'
+} from './streak-tracker'
 
 export {
   formatXPNotification,
   formatLevelUp,
-} from './progress-display.js'
+} from './progress-display'

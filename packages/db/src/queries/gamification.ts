@@ -1,8 +1,28 @@
 // Queries de gamificação — XP awards e eventos
 
-import { supabase } from '../client.js'
+import { supabase } from '../client'
 import { logger } from '@koda/shared'
-import { calculateLevel } from '@koda/gamification'
+
+// Inline level calculation to avoid circular dependency with @koda/gamification
+const LEVELS = [
+  { minXP: 10000, level: 8, title: 'Mestre Koda' },
+  { minXP: 7000, level: 7, title: 'Arquiteto' },
+  { minXP: 4000, level: 6, title: 'Fullstack' },
+  { minXP: 2000, level: 5, title: 'Developer' },
+  { minXP: 1000, level: 4, title: 'Codador' },
+  { minXP: 500, level: 3, title: 'Praticante' },
+  { minXP: 200, level: 2, title: 'Aprendiz' },
+  { minXP: 0, level: 1, title: 'Curioso' },
+] as const
+
+function calculateLevel(totalXP: number): { level: number; title: string } {
+  for (const entry of LEVELS) {
+    if (totalXP >= entry.minXP) {
+      return { level: entry.level, title: entry.title }
+    }
+  }
+  return { level: 1, title: 'Curioso' }
+}
 
 export async function awardXP(userId: string, xp: number, action: string): Promise<{ leveledUp: boolean; newLevel: number; newTitle: string }> {
   try {
