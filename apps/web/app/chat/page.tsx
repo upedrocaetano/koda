@@ -5,11 +5,14 @@ import { useChatStore } from '@/stores/chat-store'
 import { useAuth } from '@/hooks/use-auth'
 import { ChatMessages } from '@/components/chat/chat-messages'
 import { ChatInput } from '@/components/chat/chat-input'
+import { LessonHeader } from '@/components/chat/lesson-header'
 
 export default function ChatPage() {
   const { user, isLoading: authLoading } = useAuth()
-  const { messages, isLoading, hasMore, sendMessage, loadHistory, loadMore } =
-    useChatStore()
+  const {
+    messages, isLoading, hasMore, currentState, lessonContext, lastXPEarned,
+    sendMessage, loadHistory, loadMore, clearXPNotification,
+  } = useChatStore()
 
   useEffect(() => {
     if (user?.id && messages.length === 0) {
@@ -47,12 +50,24 @@ export default function ChatPage() {
         </div>
       </div>
 
+      {/* Lesson Header */}
+      {lessonContext && (
+        <LessonHeader
+          moduleName={lessonContext.module_name}
+          conceptName={lessonContext.concept_name}
+          state={currentState}
+        />
+      )}
+
       {/* Messages */}
       <ChatMessages
         messages={messages}
         isLoading={isLoading}
         hasMore={hasMore}
+        lastXPEarned={lastXPEarned}
         onLoadMore={() => user?.id && loadMore(user.id)}
+        onSendGateResponse={(msg) => user?.id && sendMessage(msg, user.id)}
+        onClearXP={clearXPNotification}
       />
 
       {/* Input */}

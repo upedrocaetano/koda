@@ -6,21 +6,44 @@ export interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
   createdAt: string
+  state?: string
+  decisions?: {
+    gate_passed: boolean | null
+    xp_earned: number
+    next_state: string
+    concept_id: string | null
+    gate_number: 1 | 2 | null
+    attempts_used: number
+    passed_with_help: boolean
+  }
+}
+
+export interface LessonContext {
+  module_name: string
+  concept_name: string
+  concept_id: string
 }
 
 interface ChatState {
   messages: ChatMessage[]
   isLoading: boolean
   hasMore: boolean
+  currentState: string
+  lessonContext: LessonContext | null
+  lastXPEarned: number
   sendMessage: (content: string, userId: string) => Promise<void>
   loadHistory: (userId: string) => Promise<void>
   loadMore: (userId: string) => Promise<void>
+  clearXPNotification: () => void
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
   messages: [],
   isLoading: false,
   hasMore: true,
+  currentState: 'HUB',
+  lessonContext: null,
+  lastXPEarned: 0,
 
   loadHistory: async (userId: string) => {
     const supabase = createSupabaseBrowserClient()
@@ -41,6 +64,17 @@ export const useChatStore = create<ChatState>((set, get) => ({
           createdAt: row.created_at,
         }))
       set({ messages, hasMore: data.length === 50 })
+    }
+
+    // Carregar estado atual da conversa
+    const { data: stateRow } = await supabase
+      .from('conversation_state')
+      .select('current_state')
+      .eq('user_id', userId)
+      .single()
+
+    if (stateRow) {
+      set({ currentState: stateRow.current_state })
     }
   },
 
@@ -100,11 +134,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
         role: 'assistant',
         content: data.response || 'Desculpe, não consegui processar sua mensagem.',
         createdAt: new Date().toISOString(),
+        state: data.state,
+        decisions: data.decisions,
       }
 
       set((state) => ({
         messages: [...state.messages, assistantMsg],
         isLoading: false,
+        currentState: data.state || state.currentState,
+        lessonContext: data.lesson_context || null,
+        lastXPEarned: data.decisions?.xp_earned || 0,
       }))
     } catch {
       set((state) => ({
@@ -121,4 +160,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
       }))
     }
   },
+
+  clearXPNotification: () => set({ lastXPEarned: 0 }),
 }))

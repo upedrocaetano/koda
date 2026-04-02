@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { ChatMessage } from './chat-message'
+import { XPNotification } from './xp-notification'
 import { MatrixButton } from '@/components/ui'
 import type { ChatMessage as ChatMessageType } from '@/stores/chat-store'
 
@@ -9,14 +10,20 @@ interface ChatMessagesProps {
   messages: ChatMessageType[]
   isLoading: boolean
   hasMore: boolean
+  lastXPEarned: number
   onLoadMore: () => void
+  onSendGateResponse: (response: string) => void
+  onClearXP: () => void
 }
 
 export function ChatMessages({
   messages,
   isLoading,
   hasMore,
+  lastXPEarned,
   onLoadMore,
+  onSendGateResponse,
+  onClearXP,
 }: ChatMessagesProps) {
   const bottomRef = useRef<HTMLDivElement>(null)
   const prevLengthRef = useRef(0)
@@ -56,8 +63,17 @@ export function ChatMessages({
       )}
 
       {messages.map((msg) => (
-        <ChatMessage key={msg.id} message={msg} />
+        <ChatMessage
+          key={msg.id}
+          message={msg}
+          onSendGateResponse={onSendGateResponse}
+          isLoading={isLoading}
+        />
       ))}
+
+      {lastXPEarned > 0 && (
+        <XPNotification xpEarned={lastXPEarned} onDone={onClearXP} />
+      )}
 
       {isLoading && (
         <div className="flex justify-start">
