@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { calculateLevel } from '@koda/gamification'
 import {
   MatrixButton,
@@ -51,10 +52,18 @@ export default function Home() {
         </MatrixCard>
 
         <div className="flex flex-wrap gap-3">
-          <MatrixButton variant="primary">Começar aula</MatrixButton>
-          <MatrixButton variant="secondary">Ver progresso</MatrixButton>
-          <MatrixButton variant="ghost">Configurações</MatrixButton>
-          <MatrixButton variant="danger">Sair</MatrixButton>
+          <Link href="/chat">
+            <MatrixButton variant="primary">Começar aula</MatrixButton>
+          </Link>
+          <Link href="/progress">
+            <MatrixButton variant="secondary">Ver progresso</MatrixButton>
+          </Link>
+          <Link href="/profile">
+            <MatrixButton variant="ghost">Configurações</MatrixButton>
+          </Link>
+          <Link href="/login">
+            <MatrixButton variant="danger">Entrar</MatrixButton>
+          </Link>
         </div>
       </div>
 
