@@ -40,6 +40,42 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Check onboarding status for authenticated users
+  if (user && !pathname.startsWith('/onboarding') && !pathname.startsWith('/auth')) {
+    const needsOnboardingCheck = ['/dashboard', '/chat', '/lessons'].some((p) =>
+      pathname.startsWith(p),
+    )
+
+    if (needsOnboardingCheck) {
+      const { data: profile } = await supabase
+        .from('users')
+        .select('onboarding_completed')
+        .eq('id', user.id)
+        .single()
+
+      if (profile && !profile.onboarding_completed) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/onboarding'
+        return NextResponse.redirect(url)
+      }
+    }
+  }
+
+  // Redirect from /onboarding to /dashboard if already completed
+  if (user && pathname.startsWith('/onboarding')) {
+    const { data: profile } = await supabase
+      .from('users')
+      .select('onboarding_completed')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.onboarding_completed) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/dashboard'
+      return NextResponse.redirect(url)
+    }
+  }
+
   const publicAuthPages = ['/login', '/signup']
   const isAuthPage = publicAuthPages.some((page) => pathname.startsWith(page))
 

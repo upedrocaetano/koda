@@ -82,6 +82,16 @@ body {
   }
 }
 
+/* Onboarding loading transition */
+@keyframes loading {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   * {
