@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.82.0",
+    "openai": "^4.85.0",
     "@koda/db": "*",
     "@koda/gamification": "*",
     "@koda/shared": "*",

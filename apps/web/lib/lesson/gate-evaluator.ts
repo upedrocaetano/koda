@@ -1,7 +1,7 @@
 // Avaliador de Portões para Web App
 // Adaptado de src/modules/lesson/gate-evaluator.ts
 
-import { claude } from '@/lib/claude'
+import { openai } from '@/lib/openai'
 
 export interface GateResult {
   passed: boolean
@@ -66,14 +66,16 @@ Aceite variações válidas (let/const/var, aspas simples/duplas, etc).
 Se tentativa ${attempts} de ${maxAttempts} e errado, ${attempts >= maxAttempts ? 'mostre a solução (inclua no feedback)' : 'dê dica progressiva'}.`
     }
 
-    const response = await claude.messages.create({
-      model: 'claude-sonnet-4-20250514',
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
       max_tokens: 500,
-      system: GATE_SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: evaluationPrompt }],
+      messages: [
+        { role: 'system', content: GATE_SYSTEM_PROMPT },
+        { role: 'user', content: evaluationPrompt },
+      ],
     })
 
-    const text = response.content[0].type === 'text' ? response.content[0].text : ''
+    const text = response.choices[0]?.message?.content ?? ''
     const jsonMatch = text.match(/\{[\s\S]*\}/)
 
     if (!jsonMatch) {

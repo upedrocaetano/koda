@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { claude } from '@/lib/claude'
+import { openai } from '@/lib/openai'
 import { evaluateGate } from '@/lib/lesson/gate-evaluator'
 import { buildLessonContext } from '@/lib/lesson/context-builder'
 import {
@@ -168,14 +168,16 @@ export async function POST(request: Request) {
         supabase, userId,
       )
 
-      const aiResponse = await claude.messages.create({
-        model: 'claude-sonnet-4-20250514',
+      const aiResponse = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
         max_tokens: 1024,
-        system: context.systemPrompt,
-        messages: [{ role: 'user', content: context.userMessage }],
+        messages: [
+          { role: 'system', content: context.systemPrompt },
+          { role: 'user', content: context.userMessage },
+        ],
       })
 
-      const rawText = aiResponse.content[0].type === 'text' ? aiResponse.content[0].text : ''
+      const rawText = aiResponse.choices[0]?.message?.content ?? ''
       const jsonMatch = rawText.match(/\{[\s\S]*\}/)
 
       if (jsonMatch) {
@@ -357,10 +359,13 @@ async function generateHubResponse(
       .map(m => `${m.role === 'user' ? 'Aluno' : 'Koda'}: ${m.content}`)
       .join('\n') || ''
 
-    const response = await claude.messages.create({
-      model: 'claude-sonnet-4-20250514',
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
       max_tokens: 800,
-      system: `Você é o Koda, professor de programação. Fala português brasileiro casual.
+      messages: [
+        {
+          role: 'system',
+          content: `Você é o Koda, professor de programação. Fala português brasileiro casual.
 O aluno ${profile.name || 'estudante'} tem ${profile.total_xp} XP (nível: ${profile.level}).
 Streak: ${profile.current_streak} dias.
 
@@ -370,13 +375,13 @@ Você está no HUB — o menu principal. Ajude o aluno a decidir o que fazer:
 - Saudações → cumprimentar e sugerir próxima ação
 
 Use markdown para formatação. Seja breve e entusiasmado.`,
-      messages: [
+        },
         ...(history ? [{ role: 'user' as const, content: `Histórico:\n${history}` }] : []),
         { role: 'user', content: message },
       ],
     })
 
-    return response.content[0].type === 'text' ? response.content[0].text : 'Opa! Me manda de novo?'
+    return response.choices[0]?.message?.content ?? 'Opa! Me manda de novo?'
   } catch {
     return `Olá${profile.name ? `, ${profile.name}` : ''}! 🟢\n\nSou o Koda, seu professor de programação.\n\nDigite **"bora"** para começar uma aula ou me faça uma pergunta!`
   }
