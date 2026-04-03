@@ -215,8 +215,9 @@ export async function POST(request: Request) {
       newState = currentState
     }
   } catch (error) {
-    console.error('Erro no pipeline de chat:', error)
-    responseText = 'Ops, tive um problema aqui. Me manda de novo? 🙏'
+    const errMsg = error instanceof Error ? error.message : String(error)
+    console.error('Erro no pipeline de chat:', errMsg)
+    responseText = `Ops, tive um problema. [debug: ${errMsg}]`
   }
 
   // 6. Salvar resposta do assistente
