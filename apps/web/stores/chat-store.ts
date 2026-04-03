@@ -57,7 +57,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     if (data) {
       const messages: ChatMessage[] = data
         .reverse()
-        .map((row) => ({
+        .map((row: { id: string; role: string; content: string; created_at: string }) => ({
           id: row.id,
           role: row.role as 'user' | 'assistant',
           content: row.content,
@@ -95,7 +95,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     if (data && data.length > 0) {
       const older: ChatMessage[] = data
         .reverse()
-        .map((row) => ({
+        .map((row: { id: string; role: string; content: string; created_at: string }) => ({
           id: row.id,
           role: row.role as 'user' | 'assistant',
           content: row.content,

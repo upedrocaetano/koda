@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser'
-import type { User } from '@supabase/supabase-js'
+import type { User, AuthChangeEvent, Session } from '@supabase/supabase-js'
 
 interface UserProfile {
   id: string
@@ -30,53 +30,80 @@ export function useAuth(): AuthState {
   const [isLoading, setIsLoading] = useState(true)
 
   const fetchProfile = useCallback(async (userId: string) => {
-    const supabase = createSupabaseBrowserClient()
-    const { data } = await supabase
-      .from('users')
-      .select('id, name, email, total_xp, current_streak, level, onboarding_completed')
-      .eq('id', userId)
-      .single()
+    try {
+      const supabase = createSupabaseBrowserClient()
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, name, email, total_xp, current_streak, level, onboarding_completed')
+        .eq('id', userId)
+        .single()
 
-    if (data) {
-      setProfile(data as UserProfile)
+      if (error) {
+        console.error('Erro ao buscar perfil:', error)
+      }
+
+      if (data) {
+        setProfile(data as UserProfile)
+      }
+    } catch (err) {
+      console.error('Erro inesperado no fetchProfile:', err)
     }
   }, [])
 
   useEffect(() => {
-    const supabase = createSupabaseBrowserClient()
+    try {
+      const supabase = createSupabaseBrowserClient()
 
-    async function getInitialSession() {
+      // Timeout de 5s para não travar o chat
+      const timeout = setTimeout(() => {
+        console.warn('useAuth: timeout de 5s atingido, liberando UI')
+        setIsLoading(false)
+      }, 5000)
+
+      async function getInitialSession() {
+        try {
+          const { data: { user: currentUser }, error } = await supabase.auth.getUser()
+
+          if (error) {
+            console.error('Erro de autenticação:', error)
+          }
+
+          setUser(currentUser)
+
+          if (currentUser) {
+            await fetchProfile(currentUser.id)
+          }
+        } catch (error) {
+          console.error('Exceção ao carregar a sessão auth:', error)
+        } finally {
+          clearTimeout(timeout)
+          setIsLoading(false)
+        }
+      }
+
+      getInitialSession()
+
       const {
-        data: { user: currentUser },
-      } = await supabase.auth.getUser()
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange(async (_event: AuthChangeEvent, session: Session | null) => {
+        const currentUser = session?.user ?? null
+        setUser(currentUser)
 
-      setUser(currentUser)
+        if (currentUser) {
+          await fetchProfile(currentUser.id)
+        } else {
+          setProfile(null)
+        }
 
-      if (currentUser) {
-        await fetchProfile(currentUser.id)
-      }
+        setIsLoading(false)
+      })
 
+      return () => subscription.unsubscribe()
+    } catch (err) {
+      console.error('Erro crítico em useAuth useEffect (verifique variáveis de ambiente):', err)
       setIsLoading(false)
+      return () => {} // fallback pra função de limpeza
     }
-
-    getInitialSession()
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      const currentUser = session?.user ?? null
-      setUser(currentUser)
-
-      if (currentUser) {
-        await fetchProfile(currentUser.id)
-      } else {
-        setProfile(null)
-      }
-
-      setIsLoading(false)
-    })
-
-    return () => subscription.unsubscribe()
   }, [fetchProfile])
 
   const signOut = useCallback(async () => {
